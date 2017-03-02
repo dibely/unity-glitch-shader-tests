@@ -1,8 +1,7 @@
 ﻿Shader "Custom/squares-geometry-shader" {
 	Properties {
-		_MainTex("Texture", 2D) = "white" {}
+		Colour("Colour", Color) = (1,0,0,1)
 		ParticleSize("ParticleSize",Range(0.001,1)) = 0.1
-		UseVertexColour("UseVertexColour", Range(0,1)) = 0.0
 	}
 	
 	SubShader {
@@ -39,42 +38,35 @@
 
 			struct app2vert {
 				float4 LocalPos : POSITION;
-				float2 uv : TEXCOORD0;
-				float4 Rgba : COLOR;
 				float3 Normal : NORMAL;
 			};
 
 			struct vert2geo {
 				float4 WorldPos : TEXCOORD1;
-				float2 uv : TEXCOORD0;
-				float4 Rgba : COLOR;
 			};
 
 			struct FragData {
-				float3 LocalOffset : TEXCOORD1;
 				float4 ScreenPos : SV_POSITION;
-				float3 Colour : TEXCOORD4;
+				float4 Colour : TEXCOORD4;
+				float3 LocalOffset : TEXCOORD1;
 			};
 
 
-			sampler2D _MainTex;
-			float4 _MainTex_ST;
 			float ParticleSize;
-			float UseVertexColour;
+			float4 Colour;
 
 			float3 GetParticleSize3() {
 				return float3(ParticleSize, ParticleSize, ParticleSize);
 			}
 
 
-			FragData MakeFragData(float3 offset, float3 colour, float3 input_WorldPos, float3 input_Rgba, float3 ParticleSize3) {
+			FragData MakeFragData(float3 offset, float3 input_WorldPos, float3 ParticleSize3) {
 				FragData x = (FragData)0;
 				x.LocalOffset = offset;
 
 				float3 x_WorldPos = mul(UNITY_MATRIX_V, float4(input_WorldPos,1)) + (x.LocalOffset * ParticleSize3);
 				x.ScreenPos = mul(UNITY_MATRIX_P, float4(x_WorldPos,1));
-				x.Colour = colour;
-				x.Colour = lerp(x.Colour, input_Rgba, UseVertexColour);
+				x.Colour = Colour;
 				return x;
 			}
 
@@ -84,9 +76,6 @@
 
 				float4 LocalPos = v.LocalPos;
 				o.WorldPos = mul(unity_ObjectToWorld, LocalPos);
-				o.uv = v.uv;
-				o.Rgba = v.Rgba;
-
 				return o;
 			}
 #endif
@@ -99,7 +88,7 @@
 				float3 ParticleSize3 = GetParticleSize3();
 
 				FragData o;
-				o = MakeFragData(v.Normal, float3(1,0,0), WorldPos, v.Rgba.xyz, ParticleSize3);
+				o = MakeFragData(v.Normal, WorldPos, ParticleSize3);
 
 				return o;
 			}
@@ -123,13 +112,13 @@
 
 				float size = 0.2;
 
-				FragData a = MakeFragData(float3(size,size,0), float3(1,0,0), input.WorldPos, input.Rgba, ParticleSize3);
-				FragData b = MakeFragData(float3(-size,-size,0), float3(1, 0, 0), input.WorldPos, input.Rgba, ParticleSize3);
-				FragData c = MakeFragData(float3(size,-size,0), float3(1, 0, 0), input.WorldPos, input.Rgba, ParticleSize3);
+				FragData a = MakeFragData(float3(size,size,0), input.WorldPos, ParticleSize3);
+				FragData b = MakeFragData(float3(-size,-size,0), input.WorldPos, ParticleSize3);
+				FragData c = MakeFragData(float3(size,-size,0), input.WorldPos, ParticleSize3);
 
-				FragData d = MakeFragData(float3(-size, size, 0), float3(0, 1, 0), input.WorldPos, input.Rgba, ParticleSize3);
-				FragData e = MakeFragData(float3(size, size, 0), float3(0, 1, 0), input.WorldPos, input.Rgba, ParticleSize3);
-				FragData f = MakeFragData(float3(size, -size, 0), float3(0, 1, 0), input.WorldPos, input.Rgba, ParticleSize3);
+				FragData d = MakeFragData(float3(-size, size, 0), input.WorldPos, ParticleSize3);
+				FragData e = MakeFragData(float3(size, size, 0), input.WorldPos, ParticleSize3);
+				FragData f = MakeFragData(float3(size, -size, 0), input.WorldPos, ParticleSize3);
 
 				OutputStream.Append(a);
 				OutputStream.Append(b);
@@ -141,7 +130,7 @@
 #endif//GEOMETRY_TRIANGULATION
 
 			fixed4 frag(FragData i) : SV_Target	{
-				return float4(i.Colour, 1);
+				return i.Colour;
 			}
 			ENDCG
 		}
