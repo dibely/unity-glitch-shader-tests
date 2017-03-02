@@ -42,13 +42,12 @@
 			};
 
 			struct vert2geo {
-				float4 WorldPos : TEXCOORD1;
+				float4 WorldPos : POSITION;
 			};
 
 			struct FragData {
 				float4 ScreenPos : SV_POSITION;
-				float4 Colour : TEXCOORD4;
-				float3 LocalOffset : TEXCOORD1;
+				float4 Colour : COLOR;
 			};
 
 
@@ -62,9 +61,8 @@
 
 			FragData MakeFragData(float3 offset, float3 input_WorldPos, float3 ParticleSize3) {
 				FragData x = (FragData)0;
-				x.LocalOffset = offset;
 
-				float3 x_WorldPos = mul(UNITY_MATRIX_V, float4(input_WorldPos,1)) + (x.LocalOffset * ParticleSize3);
+				float3 x_WorldPos = mul(UNITY_MATRIX_V, float4(input_WorldPos,1)) + (offset * ParticleSize3);
 				x.ScreenPos = mul(UNITY_MATRIX_P, float4(x_WorldPos,1));
 				x.Colour = Colour;
 				return x;

@@ -43,13 +43,12 @@
 		};
 
 			struct vert2geo {
-				float4 WorldPos : TEXCOORD1;
+				float4 WorldPos : POSITION;
 				float2 uv : TEXCOORD0;
 			};
 
 			struct FragData {
 				float4 ScreenPos : SV_POSITION;
-				float3 LocalOffset : TEXCOORD1;
 				float2 uv : TEXCOORD0;
 			};
 
@@ -63,11 +62,10 @@
 			}
 
 
-			FragData MakeFragData(float3 offset, float3 colour, float3 input_WorldPos, float2 uv, float3 ParticleSize3) {
+			FragData MakeFragData(float3 offset, float3 input_WorldPos, float2 uv, float3 ParticleSize3) {
 				FragData x = (FragData)0;
-				x.LocalOffset = offset;
 
-				float3 x_WorldPos = mul(UNITY_MATRIX_V, float4(input_WorldPos,1)) + (x.LocalOffset * ParticleSize3);
+				float3 x_WorldPos = mul(UNITY_MATRIX_V, float4(input_WorldPos,1)) + (offset * ParticleSize3);
 				x.ScreenPos = mul(UNITY_MATRIX_P, float4(x_WorldPos,1));
 				x.uv = uv;
 				return x;
@@ -93,7 +91,7 @@
 				float3 ParticleSize3 = GetParticleSize3();
 
 				FragData o;
-				o = MakeFragData(v.Normal, float3(1,0,0), WorldPos, v.Rgba.xyz, v.uv, ParticleSize3);
+				o = MakeFragData(v.Normal, WorldPos, v.uv, ParticleSize3);
 
 				return o;
 			}
@@ -117,13 +115,13 @@
 
 				float size = 0.2;
 
-				FragData a = MakeFragData(float3(size,size,0), float3(1,0,0), input.WorldPos, input.uv, ParticleSize3);
-				FragData b = MakeFragData(float3(-size,-size,0), float3(1, 0, 0), input.WorldPos, input.uv, ParticleSize3);
-				FragData c = MakeFragData(float3(size,-size,0), float3(1, 0, 0), input.WorldPos, input.uv, ParticleSize3);
+				FragData a = MakeFragData(float3(size,size,0), input.WorldPos, input.uv, ParticleSize3);
+				FragData b = MakeFragData(float3(-size,-size,0), input.WorldPos, input.uv, ParticleSize3);
+				FragData c = MakeFragData(float3(size,-size,0), input.WorldPos, input.uv, ParticleSize3);
 
-				FragData d = MakeFragData(float3(-size, size, 0), float3(0, 1, 0), input.WorldPos, input.uv, ParticleSize3);
-				FragData e = MakeFragData(float3(size, size, 0), float3(0, 1, 0), input.WorldPos, input.uv, ParticleSize3);
-				FragData f = MakeFragData(float3(size, -size, 0), float3(0, 1, 0), input.WorldPos, input.uv, ParticleSize3);
+				FragData d = MakeFragData(float3(-size, size, 0), input.WorldPos, input.uv, ParticleSize3);
+				FragData e = MakeFragData(float3(size, size, 0), input.WorldPos, input.uv, ParticleSize3);
+				FragData f = MakeFragData(float3(size, -size, 0), input.WorldPos, input.uv, ParticleSize3);
 
 				OutputStream.Append(a);
 				OutputStream.Append(b);
