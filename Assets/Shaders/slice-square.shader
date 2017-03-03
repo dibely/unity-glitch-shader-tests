@@ -1,4 +1,4 @@
-﻿Shader "Custom/glitch-square" {
+﻿Shader "Custom/slice-square" {
 	// Simple slicing example taken from https://docs.unity3d.com/Manual/SL-SurfaceShaderExamples.html
 	Properties{
 		_MainTex("Texture", 2D) = "white" {}
@@ -17,6 +17,7 @@
 	sampler2D _MainTex;
 	sampler2D _BumpMap;
 	void surf(Input IN, inout SurfaceOutput o) {
+		// Clip the horizontal and vertical to create square cutouts
 		clip(frac((IN.worldPos.y + IN.worldPos.z*0.1) * 10) - 0.7);
 		clip(frac((IN.worldPos.x + IN.worldPos.z*0.1) * 10) - 0.7);
 		o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
