@@ -115,20 +115,19 @@
 
 				float size = 0.2;
 
-				FragData a = MakeFragData(float3(size,size,0), input.WorldPos, input.uv, ParticleSize3);
-				FragData b = MakeFragData(float3(-size,-size,0), input.WorldPos, input.uv, ParticleSize3);
-				FragData c = MakeFragData(float3(size,-size,0), input.WorldPos, input.uv, ParticleSize3);
+				// Add four vertices to the output stream that will be drawn as a triangle strip making a quad
+				FragData vertex = MakeFragData(float3(-size,-size,0), input.WorldPos, input.uv, ParticleSize3);
+				OutputStream.Append(vertex);
 
-				FragData d = MakeFragData(float3(-size, size, 0), input.WorldPos, input.uv, ParticleSize3);
-				FragData e = MakeFragData(float3(size, size, 0), input.WorldPos, input.uv, ParticleSize3);
-				FragData f = MakeFragData(float3(size, -size, 0), input.WorldPos, input.uv, ParticleSize3);
+				vertex = MakeFragData(float3(size,-size,0), input.WorldPos, input.uv, ParticleSize3);
+				OutputStream.Append(vertex);
 
-				OutputStream.Append(a);
-				OutputStream.Append(b);
-				OutputStream.Append(c);
-				OutputStream.Append(d);
-				OutputStream.Append(e);
-				OutputStream.Append(f);
+				vertex = MakeFragData(float3(-size,size,0), input.WorldPos, input.uv, ParticleSize3);
+				OutputStream.Append(vertex);
+
+				vertex = MakeFragData(float3(size, size, 0), input.WorldPos, input.uv, ParticleSize3);
+				OutputStream.Append(vertex);
+
 			}
 #endif//GEOMETRY_TRIANGULATION
 
