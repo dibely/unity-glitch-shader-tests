@@ -1,4 +1,6 @@
-﻿Shader "Custom/basic-geometry-shader" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/basic-geometry-shader" {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
@@ -40,7 +42,7 @@
 			v2f vert(appdata v)
 			{
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				o.normal = v.normal;
 				o.worldPosition = mul(unity_ObjectToWorld, v.vertex).xyz;
